@@ -17,17 +17,48 @@ using std::string;
 #include<vector>
 using std::vector;
 
+
+struct subVector{
+    int lower;
+    int upper;
+    int sum;
+};
+
+
 /***************************************************************************************
- ** Function: subArraySum
- ** Description: Returns the sum of elements in an integer array within specified range
+ ** Function: _maxSumCrossingArray
+ ** Description:
  ** Parameters:
  ***************************************************************************************/
-int subArraySum (vector<int> v,int low , int high){
-    int sum = 0;
-    for (int i = low; i <= high;i ++){
-        sum += v[i];
+struct subVector _maxSumCrossingArray (vector<int> v,int low, int mid, int high){
+    struct subVector subVect;
+    int maxSumL, maxSumR, runningSum;
+
+    subVect.lower = mid;
+    subVect.upper = mid + 1;
+    subVect.sum = v[mid] + v[mid + 1];
+
+    maxSumL = v[mid];
+    runningSum = v[mid];
+    for(int i = mid - 1; i >= low ; i--){
+        runningSum += v[i];
+        if(runningSum > maxSumL){
+            maxSumL = runningSum;
+            subVect.lower = i;
+        }
     }
-    return sum;
+
+    maxSumR = v[mid + 1];
+    runningSum = v[mid + 1];
+    for(int i = mid + 2; i <= high; i++){
+        runningSum += v[i];
+        if(runningSum > maxSumR){
+            maxSumR = runningSum;
+            subVect.upper = i;
+        }
+    }
+    subVect.sum = maxSumL + maxSumR;
+    return subVect;
 }
 
 /***************************************************************************************
@@ -35,10 +66,11 @@ int subArraySum (vector<int> v,int low , int high){
  ** Description:
  ** Parameters:
  ***************************************************************************************/
-vector<int> enumeration (vector<int> v){
-    int lower = 0;
-    int upper = 0;
-    int maxSum = v[0];
+struct subVector enumeration (vector<int> v){
+    struct subVector subVect;
+    subVect.lower = 0;
+    subVect.upper = 0;
+    subVect.sum = v[0];
     int tempSum;
     int length = v.size();
 
@@ -50,18 +82,16 @@ vector<int> enumeration (vector<int> v){
                 tempSum += v[k];
             }
             //Track the sum and endpoints of max subarray.
-            if (tempSum > maxSum){
-                maxSum = tempSum;
-                lower = i;
-                upper = j;
+            if (tempSum > subVect.sum){
+                subVect.sum = tempSum;
+                subVect.lower = i;
+                subVect.upper = j;
             }
         }
     }
 
     //Create a new vector for the maximum subarray and return.
-    vector<int>::const_iterator first = v.begin() + lower;
-    vector<int>::const_iterator last = v.begin() + upper + 1;
-    vector<int> subVect(first, last);
+
     return subVect;
 }
 
@@ -70,10 +100,11 @@ vector<int> enumeration (vector<int> v){
  ** Description:
  ** Parameters:
  ***************************************************************************************/
-vector<int> betterEnumeration (vector<int> v){
-    int lower = 0;
-    int upper = 0;
-    int maxSum = v[0];
+struct subVector betterEnumeration (vector<int> v){
+    struct subVector subVect;
+    subVect.lower = 0;
+    subVect.upper = 0;
+    subVect.sum = v[0];
     int tempSum;
     int length = v.size();
 
@@ -83,16 +114,13 @@ vector<int> betterEnumeration (vector<int> v){
         for(int j = i; j < length; j++){
             tempSum += v[j];
             //Track the sum and endpoints of max subarray.
-            if (tempSum > maxSum){
-                maxSum = tempSum;
-                lower = i;
-                upper = j;
+            if (tempSum > subVect.sum){
+                subVect.sum = tempSum;
+                subVect.lower = i;
+                subVect.upper = j;
             }
         }
     }
-    vector<int>::const_iterator first = v.begin() + lower;
-    vector<int>::const_iterator last = v.begin() + upper + 1;
-    vector<int> subVect(first, last);
     return subVect;
 }
 
@@ -101,33 +129,30 @@ vector<int> betterEnumeration (vector<int> v){
  ** Description:
  ** Parameters:
  ***************************************************************************************/
-vector<int> divideAndConquer (vector<int> v,int low, int high){
-    int lower = 0;
-    int upper = 0;
-    int maxSumL, maxSumR, maxSumLR;
-    vector<int> subVectL;
-    vector<int> subVectR;
-    vector<int> subVect;
+struct subVector divideAndConquer (vector<int> v,int low, int high){
+    struct subVector subVectL;
+    struct subVector subVectR;
+    struct subVector subVectC;
+    struct subVector subVect;
 
-    if(low < high){
+    subVect.lower = low;
+    subVect.upper = high;
+    subVect.sum = v[low];
+    if(low == high){
+        return subVect;
+    }
+    else {
         int mid = (low + high)/2;
         subVectL = divideAndConquer(v,low,mid);
         subVectR = divideAndConquer(v,mid+1,high);
-        maxSumL = subArraySum(subVectL,0,subVectL.size());
-        maxSumR = subArraySum(subVectR,0,subVectR.size());
-        maxSumLR = maxSumL + maxSumR; // + 'intermediateSum' - Need to find way to compute sum of terms in between the max left and right subarrays
-        if (maxSumL > maxSumR && maxSumL > maxSumLR)
-            subVect = subVectL;
-        else if (maxSumR > maxSumL && maxSumR > maxSumLR)
-            subVect = subVectR;
+        subVectC = _maxSumCrossingArray(v,low,mid,high);
+        if(subVectL.sum >= subVectR.sum && subVectL.sum >= subVectC.sum)
+            return subVectL;
+        else if(subVectR.sum >= subVectL.sum && subVectR.sum >= subVectC.sum)
+            return subVectR;
         else
-            subVect  = subVect; //Again, need to find terms in original vector between the max left and right subarrays
+            return subVectC;
     }
-    else {
-        vector<int>::const_iterator first = v.begin();
-        vector<int> subVect(first, first);
-    }
-    return subVect;
 }
 
 /***************************************************************************************
@@ -135,13 +160,10 @@ vector<int> divideAndConquer (vector<int> v,int low, int high){
  ** Description:
  ** Parameters:
  ***************************************************************************************/
-vector<int> linearTime (vector<int> v){
-    int lower = 0;
-    int upper = 0;
+struct subVector linearTime (vector<int> v){
+    struct subVector subVect;
 
-    vector<int>::const_iterator first = v.begin() + lower;
-    vector<int>::const_iterator last = v.begin() + upper + 1;
-    vector<int> subVect(first, last);
+
     return subVect;
 }
 
@@ -153,7 +175,6 @@ vector<int> linearTime (vector<int> v){
 int main(){
     string fileName, outputFile, inputStr;
     int value;
-    int maxSum = 0;
     vector<int> vect;
 
     //User specifies name of file to read input from.
@@ -207,8 +228,8 @@ while (std::getline(inFile, inputStr))
 
     // Output the starting array.
     cout << "[";
-    for(int i = 0; i< vect.size(); i++){
-        if(i == vect.size()-1)
+    for(int i = 0; i < (int)vect.size(); i++){
+        if(i == (int)vect.size()-1)
             cout << vect[i];
         else
             cout << vect[i] << ", ";
@@ -216,20 +237,18 @@ while (std::getline(inFile, inputStr))
     cout << "]" << endl;
 
     // Output the maximum sum subarray and display its sum.
-    vector<int> subVect = betterEnumeration(vect);
+    struct subVector maxArray = divideAndConquer(vect,0,vect.size()-1);
     cout << "Subvector: [";
-    for(int i = 0; i< subVect.size(); i++){
-        maxSum += subVect[i];
-        if(i == subVect.size()-1)
-            cout << subVect[i];
+    for(int i = maxArray.lower; i<= maxArray.upper; i++){
+        if(i == maxArray.upper)
+            cout << vect[i];
         else
-            cout << subVect[i] << ", ";
+            cout << vect[i] << ", ";
     }
-    cout << "]" << endl << "Maximum Sum: " << maxSum << endl << endl;
+    cout << "]" << endl << "Maximum Sum: " << maxArray.sum << endl << endl;
 
     //Clear vector and sum for computations on next array in input file.
     vect.clear();
-    maxSum = 0;
 }
 
     inFile.close();
