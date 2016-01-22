@@ -24,7 +24,6 @@ struct subVector{
     int sum;
 };
 
-
 /***************************************************************************************
  ** Function: _maxSumCrossingArray
  ** Description:
@@ -62,21 +61,37 @@ struct subVector _maxSumCrossingArray (vector<int> v,int low, int mid, int high)
 }
 
 /***************************************************************************************
+ ** Function: displayArray
+ ** Description:
+ ** Parameters:
+ ***************************************************************************************/
+void displayArray(vector<int> vect, struct subVector subVect){
+    cout << "Subvector: [";
+    for(int i = subVect.lower; i<= subVect.upper; i++){
+        if(i == subVect.upper)
+            cout << vect[i];
+        else
+            cout << vect[i] << ", ";
+    }
+    cout << "]" << endl << "Maximum Sum: " << subVect.sum << endl << endl;
+}
+
+
+/***************************************************************************************
  ** Function: enumeration
  ** Description:
  ** Parameters:
  ***************************************************************************************/
-struct subVector enumeration (vector<int> v){
+struct subVector enumeration (vector<int> v, int low, int high){
     struct subVector subVect;
-    subVect.lower = 0;
-    subVect.upper = 0;
-    subVect.sum = v[0];
+    subVect.lower = low;
+    subVect.upper = high;
+    subVect.sum = v[low];
     int tempSum;
-    int length = v.size();
 
     //Calculate sum of every subarray starting from scratch each time.
-    for (int i = 0; i < length; i++){
-        for(int j = i; j < length; j++){
+    for (int i = low; i <= high; i++){
+        for(int j = i; j <= high; j++){
             tempSum = 0;
             for(int k = i; k <= j; k++){
                 tempSum += v[k];
@@ -100,18 +115,17 @@ struct subVector enumeration (vector<int> v){
  ** Description:
  ** Parameters:
  ***************************************************************************************/
-struct subVector betterEnumeration (vector<int> v){
+struct subVector betterEnumeration (vector<int> v, int low, int high){
     struct subVector subVect;
-    subVect.lower = 0;
-    subVect.upper = 0;
-    subVect.sum = v[0];
+    subVect.lower = low;
+    subVect.upper = high;
+    subVect.sum = v[low];
     int tempSum;
-    int length = v.size();
 
     //Calculate sum of every subarray by adding onto the sums of smaller subarrays.
-    for (int i = 0; i < length; i++){
+    for (int i = low; i <= high; i++){
         tempSum = 0;
-        for(int j = i; j < length; j++){
+        for(int j = i; j <= high; j++){
             tempSum += v[j];
             //Track the sum and endpoints of max subarray.
             if (tempSum > subVect.sum){
@@ -160,8 +174,12 @@ struct subVector divideAndConquer (vector<int> v,int low, int high){
  ** Description:
  ** Parameters:
  ***************************************************************************************/
-struct subVector linearTime (vector<int> v){
+struct subVector linearTime (vector<int> v,int low, int high){
     struct subVector subVect;
+    subVect.lower = low;
+    subVect.upper = high;
+    subVect.sum = v[low];
+
 
 
     return subVect;
@@ -176,6 +194,7 @@ int main(){
     string fileName, outputFile, inputStr;
     int value;
     vector<int> vect;
+    struct subVector maxArray;
 
     //User specifies name of file to read input from.
     cout << "Please input name of input file:" << endl;
@@ -227,25 +246,33 @@ while (std::getline(inFile, inputStr))
     }
 
     // Output the starting array.
-    cout << "[";
+    cout << endl << "Starting Array:" << endl << "[";
     for(int i = 0; i < (int)vect.size(); i++){
         if(i == (int)vect.size()-1)
             cout << vect[i];
         else
             cout << vect[i] << ", ";
     }
-    cout << "]" << endl;
+    cout << "]" << endl << endl;
 
     // Output the maximum sum subarray and display its sum.
-    struct subVector maxArray = divideAndConquer(vect,0,vect.size()-1);
-    cout << "Subvector: [";
-    for(int i = maxArray.lower; i<= maxArray.upper; i++){
-        if(i == maxArray.upper)
-            cout << vect[i];
-        else
-            cout << vect[i] << ", ";
-    }
-    cout << "]" << endl << "Maximum Sum: " << maxArray.sum << endl << endl;
+
+
+    maxArray = enumeration(vect,0,vect.size()-1);
+    cout << "Algorithm 1:" << endl;
+    displayArray(vect,maxArray);
+
+    maxArray = betterEnumeration(vect,0,vect.size()-1);
+    cout << "Algorithm 2:" << endl;
+    displayArray(vect,maxArray);
+
+    maxArray = divideAndConquer(vect,0,vect.size()-1);
+    cout << "Algorithm 3:" << endl;
+    displayArray(vect,maxArray);
+
+    maxArray = linearTime(vect,0,vect.size()-1);
+    cout << "Algorithm 4:" << endl;
+    displayArray(vect,maxArray);
 
     //Clear vector and sum for computations on next array in input file.
     vect.clear();
