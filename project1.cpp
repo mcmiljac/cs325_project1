@@ -17,6 +17,7 @@ using std::string;
 #include<vector>
 using std::vector;
 
+#include <ctime>
 
 struct subVector{
     int lower;
@@ -206,6 +207,103 @@ struct subVector linearTime (vector<int> v,int low, int high){
 }
 
 /***************************************************************************************
+ ** Function: runTimeAnalysis
+ ** Description:
+ ** Parameters:
+ ***************************************************************************************/
+void runTimeAnalysis(int input, int algNum) {
+	vector<int> alg1;
+	vector<int> alg2;
+	vector<int> alg3;
+	vector<int> alg4;
+	
+	int alg1Times[10], alg2Times[10], alg3Times[10], alg4Times[10];
+	int alg1Sum = 0, alg2Sum = 0, alg3Sum = 0, alg4Sum = 0, alg1Avg = 0, alg2Avg = 0, alg3Avg = 0, alg4Avg = 0;
+	int randInt, lowest = -9999, highest = 9999;
+	int range = (highest - lowest) + 1;
+
+	clock_t start, end;
+	double timeInSecs;
+	
+	switch (algNum) { 
+		case 1:
+			//Algorithm 1
+			cout << "Algorithm 1:" << endl; 
+			for (int i = 1; i <= 10; i++) {
+				for (int j = 0; j < input; j++){  
+					randInt = lowest+ (int) (range*(rand()/(RAND_MAX + 1.0)));
+					alg1.push_back(randInt);
+				}
+				start = clock();
+				enumeration(alg1, 0, alg1.size()-1);
+				end = clock();
+				timeInSecs = (end - start) / (long double) CLOCKS_PER_SEC;
+				alg1Times[i] = timeInSecs;
+				alg1Sum += alg1Times[i];
+			}	
+			alg1Avg = alg1Sum / 10;
+			cout << "Average Run-Time: " << alg1Avg << endl;
+			break;
+		case 2:	
+			//Algorithm 2
+			cout << "Algorithm 2:" << endl; 
+			for (int i = 1; i <= 10; i++) {
+				for (int j = 0; j < input; j++){  
+					randInt = lowest+ (int) (range*(rand()/(RAND_MAX + 1.0)));
+					alg2.push_back(randInt);
+				}
+				start = clock();
+				betterEnumeration(alg2, 0, alg2.size()-1);
+				end = clock();
+				timeInSecs = (end - start) / (long double) CLOCKS_PER_SEC;
+				alg2Times[i] = timeInSecs;
+				alg2Sum += alg2Times[i];
+			}	
+			alg2Avg = alg2Sum / 10;
+			cout << "Average Run-Time: " << alg2Avg << endl;
+			break;
+		case 3:
+			//Algorithm 3
+			cout << "Algorithm 3:" << endl; 
+			for (int i = 1; i <= 10; i++) {
+				for (int j = 0; j < input; j++){  
+					randInt = lowest+ (int) (range*(rand()/(RAND_MAX + 1.0)));
+					alg3.push_back(randInt);
+				}
+				start = clock();
+				divideAndConquer(alg3, 0, alg3.size()-1);
+				end = clock();
+				timeInSecs = (end - start) / (long double) CLOCKS_PER_SEC;
+				alg3Times[i] = timeInSecs;
+				alg3Sum += alg3Times[i];
+			}	
+			alg3Avg = alg3Sum / 10;
+			cout << "Average Run-Time: " << alg3Avg << endl;
+			break;
+		case 4:
+			//Algorithm 4
+			cout << "Algorithm 4:" << endl; 
+			for (int i = 1; i <= 10; i++) {
+				for (int j = 0; j < input; j++){  
+					randInt = lowest+ (int) (range*(rand()/(RAND_MAX + 1.0)));
+					alg4.push_back(randInt);
+				}
+				start = clock();
+				linearTime(alg4, 0, alg4.size()-1);
+				end = clock();
+				timeInSecs = (end - start) / (long double) CLOCKS_PER_SEC;
+				alg4Times[i] = timeInSecs;
+				alg4Sum += alg4Times[i];
+			}	
+			alg4Avg = alg4Sum / 10;
+			cout << "Average Run-Time: " << alg4Avg << endl;
+			break;
+		default:
+			cout << "Invalid choice." << endl; 
+	}	
+}
+
+/***************************************************************************************
  ** Function: main
  ** Description:
  ** Parameters:
@@ -215,8 +313,16 @@ int main(){
     int value;
     vector<int> vect;
     struct subVector maxArray;
+    srand(time(0));
 
-    //User specifies name of file to read input from.
+    int algNum = 0, inputSize = 0;
+   // runTimeAnalysis(200, 1);
+   // runTimeAnalysis(20000, 2);
+    runTimeAnalysis(14000, 3);
+    runTimeAnalysis(16000, 3);
+   // runTimeAnalysis(100000, 4);
+	
+/*    //User specifies name of file to read input from.
     cout << "Please input name of input file:" << endl;
     cin >> fileName;
     ifstream inFile;
@@ -234,7 +340,7 @@ int main(){
         inFile.open(fileName.c_str());
     }
 
-/*
+
     cout << endl << "Please input name of output file:" << endl;
     cin >> outputFile;
 
@@ -249,7 +355,7 @@ int main(){
         cin >> outputFile;
         outFile.open(outputFile.c_str());
     }
-*/
+
 
 // Read file line-by-line.
 while (std::getline(inFile, inputStr))
@@ -300,8 +406,8 @@ while (std::getline(inFile, inputStr))
     //Clear vector and sum for computations on next array in input file.
     vect.clear();
 }
-
-    inFile.close();
+*/
+//    inFile.close();
     //outFile.close();
     return 0;
 }
