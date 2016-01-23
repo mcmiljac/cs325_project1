@@ -264,7 +264,10 @@ while (std::getline(inFile, inputStr))
         else if (iss.peek() == ']')
             break;
     }
-
+	
+	if(vect.size()==0)
+        continue;
+	
     // Output the starting array.
     cout << endl << "Starting Array:" << endl << "[";
     for(int i = 0; i < (int)vect.size(); i++){
