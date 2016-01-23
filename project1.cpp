@@ -180,7 +180,27 @@ struct subVector linearTime (vector<int> v,int low, int high){
     subVect.upper = high;
     subVect.sum = v[low];
 
+    int maxSum = 0, currentSum = 0, endHigh = 0, endLow = 0, endLeft =0, endRight = 0;
 
+    for (int j = low; j <= high; j++) {
+	currentSum += v[j];
+	if (currentSum > maxSum) {
+		maxSum = currentSum;
+		endRight = j;
+		endLow = endLeft;
+		endHigh = endRight;
+	}
+	if (currentSum < 0) {
+		currentSum = 0;
+		endLeft = j + 1;
+		endRight = j + 1;
+	}
+
+    }
+	subVect.lower = endLeft;
+	subVect.upper = endRight;
+	subVect.sum = maxSum;
+				
 
     return subVect;
 }
